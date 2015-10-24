@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
       
       } else {
       
-        printf("%i", mySwitch.getReceivedValue());
+        printf("%i@%i", mySwitch.getReceivedValue(), mySwitch.getReceivedDelay());
       
       }
 

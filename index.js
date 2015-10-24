@@ -19,16 +19,17 @@ var Sniffer = function(pin, debounceDelay) {
   var self = this;
   var cmd = spawn(path.join(__dirname, scripts.read), [pin]);
 
-  cmd.stdout.on('data', _.debounce(function (code) {
+  cmd.stdout.on('data', _.debounce(function (fullCode) {
 
-    code = parseInt(code);
+    code = parseInt(fullCode.toString().split('@')[0]);
+    pulse = parseInt(fullCode.toString().split('@')[1]);
 
     if(lastCodeSent == code) {
       lastCodeSent = null;
       return;
     }
 
-    self.emit('codes', code);
+    self.emit('codes', {code: code, pulse: pulse});
     self.emit(code);
 
   }, debounceDelay, true));
@@ -54,41 +55,16 @@ module.exports = {
 
   },
 
-  sendCode: function (code, pin, callback) {
-
-    var defaults = {
-      pin: 0,
-      callback: function defaultCallback(){}
-    };
-
-    switch(arguments.length) {
-
-      case 1:
-
-        pin = defaults.pin;
-        callback = defaults.callback;
-
-      break;
-
-      case 2:
-
-        if(typeof pin === 'function') {
-          callback = pin;
-          pin = defaults.pin;
-        } else if (typeof pin === 'number') {
-          callback = function() {};
-        } else {
-          pin = defaults.pin;
-          callback = defaults.callback;
-        }
-
-      break;
-
-    }
+  sendCode: function (params) {
+    
+    var pin = typeof params.pin !== 'undefined' ? params.pin : 0;
+    var code = params.code;
+    var callback = typeof params.callback === 'function' ? params.callback : function() {};
+    var pulse = params.pulse ? params.pulse : 353;
 
     lastCodeSent = code;
 
-    exec(path.join(__dirname, scripts.emit)+' '+pin+' '+code, function (error, stderr, stdout) {
+    exec(path.join(__dirname, scripts.emit)+' '+pin+' '+code+' '+pulse, function (error, stderr, stdout) {
 
       callback(error, stderr, stdout);
 

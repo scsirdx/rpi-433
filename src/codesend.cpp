@@ -13,6 +13,7 @@ int main(int argc, char *argv[]) {
   
   int PIN = atoi(argv[1]);
   int code = atoi(argv[2]);
+  int pulse = atoi(argv[3]);
 
   if (wiringPiSetup () == -1)
     return 1;
@@ -20,6 +21,7 @@ int main(int argc, char *argv[]) {
   printf("%i", code);
   RCSwitch mySwitch = RCSwitch();
   mySwitch.enableTransmit(PIN);
+  mySwitch.setPulseLength(pulse);
 
   mySwitch.send(code, 24);
 
