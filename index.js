@@ -17,6 +17,7 @@ var Sniffer = function(pin, debounceDelay) {
   EventEmitter.call(this);
 
   var self = this;
+  var kill = spawn('killall', ['-9', 'RFSniffer']);
   var cmd = spawn(path.join(__dirname, scripts.read), [pin]);
 
   cmd.stdout.on('data', _.debounce(function (fullCode) {
